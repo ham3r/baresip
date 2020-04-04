@@ -942,6 +942,19 @@ int account_set_answermode(struct account *acc, enum answermode mode)
 
 
 /**
+ * Get the SIP address of an account
+ *
+ * @param acc User-Agent account
+ *
+ * @return SIP address
+ */
+const char *account_address(const struct account *acc)
+{
+	return acc ? acc->buf : NULL;
+}
+
+
+/**
  * Get the SIP Display Name of an account
  *
  * @param acc User-Agent account

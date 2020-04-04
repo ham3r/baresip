@@ -423,6 +423,25 @@ static int cmd_ua_delete(struct re_printf *pf, void *arg)
 }
 
 
+static int cmd_ua_all_address(struct re_printf *pf, void *unused)
+{
+	int err = 0;
+
+	(void)pf;
+	(void)unused;
+
+	struct le *le;
+
+	for (le = list_head(uag_list()); le; le = le->next) {
+		struct ua *ua = le->data;
+
+		err |= re_hprintf(pf, "%s\n", account_address(ua_account(ua)));
+	}
+
+	return err;
+}
+
+
 static int cmd_ua_find_dispname(struct re_printf *pf, void *arg)
 {
 	const struct cmd_arg *carg = arg;
@@ -538,6 +557,7 @@ static const struct cmd cmdv[] = {
 {"uanew",     0,    CMD_PRM, "Create User-Agent",       create_ua            },
 {"uadel",     0,    CMD_PRM, "Delete User-Agent",       cmd_ua_delete        },
 {"uafind",    0,    CMD_PRM, "Find User-Agent <aor>",   cmd_ua_find          },
+{"uaalladdr", 0,    CMD_PRM, "List UAs address",        cmd_ua_all_address },
 {"uafind_dn", 0,    CMD_PRM, "Find UA <dispname>",      cmd_ua_find_dispname },
 {"uadel_dn",  0,    CMD_PRM, "Delete UA <dispname>",    cmd_ua_delete_dispname },
 {"ausrc",     0,    CMD_PRM, "Switch audio source",     switch_audio_source  },
