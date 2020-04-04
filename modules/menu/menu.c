@@ -423,6 +423,65 @@ static int cmd_ua_delete(struct re_printf *pf, void *arg)
 }
 
 
+static int cmd_ua_find_dispname(struct re_printf *pf, void *arg)
+{
+	const struct cmd_arg *carg = arg;
+	struct ua *ua = NULL;
+
+	if (str_isset(carg->prm)) {
+		ua = uag_find_dispname(carg->prm);
+	}
+
+	if (!ua) {
+		warning("menu: ua_find_dn failed: %s\n", carg->prm);
+		return ENOENT;
+	}
+
+	re_hprintf(pf, "ua: %s\n", ua_aor(ua));
+
+	uag_current_set(ua);
+
+	update_callstatus();
+
+	return 0;
+}
+
+
+static int cmd_ua_delete_dispname(struct re_printf *pf, void *arg)
+{
+	const struct cmd_arg *carg = arg;
+	struct ua *ua = NULL;
+	int occurence = 0;
+
+	do {
+		if (str_isset(carg->prm)) {
+			ua = uag_find_dispname(carg->prm);
+		}
+
+		if (!ua) {
+			if (occurence <= 0) {
+				return ENOENT;
+			} else {
+				continue;
+			}
+		}
+
+		if (ua == uag_current()) {
+			(void)cmd_ua_next(pf, NULL);
+		}
+
+		(void)re_hprintf(pf, "deleting ua: %s\n", carg->prm);
+		mem_deref(ua);
+
+		occurence++;
+	} while(ua);
+
+	(void)ua_print_reg_status(pf, NULL);
+
+	return 0;
+}
+
+
 static int print_commands(struct re_printf *pf, void *unused)
 {
 	(void)unused;
@@ -479,6 +538,8 @@ static const struct cmd cmdv[] = {
 {"uanew",     0,    CMD_PRM, "Create User-Agent",       create_ua            },
 {"uadel",     0,    CMD_PRM, "Delete User-Agent",       cmd_ua_delete        },
 {"uafind",    0,    CMD_PRM, "Find User-Agent <aor>",   cmd_ua_find          },
+{"uafind_dn", 0,    CMD_PRM, "Find UA <dispname>",      cmd_ua_find_dispname },
+{"uadel_dn",  0,    CMD_PRM, "Delete UA <dispname>",    cmd_ua_delete_dispname },
 {"ausrc",     0,    CMD_PRM, "Switch audio source",     switch_audio_source  },
 {"auplay",    0,    CMD_PRM, "Switch audio player",     switch_audio_player  },
 {"about",     0,          0, "About box",               about_box            },

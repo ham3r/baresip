@@ -1903,6 +1903,30 @@ struct ua *uag_find_aor(const char *aor)
 
 
 /**
+ * Find a User-Agent (UA) from an display name
+ *
+ * @param aor display name string
+ *
+ * @return User-Agent (UA) if found, otherwise NULL
+ */
+struct ua *uag_find_dispname(const char *dispname)
+{
+	struct le *le;
+
+	for (le = uag.ual.head; le; le = le->next) {
+		struct ua *ua = le->data;
+
+		if (str_isset(dispname) && str_cmp(ua->acc->dispname, dispname))
+			continue;
+
+		return ua;
+	}
+
+	return NULL;
+}
+
+
+/**
  * Find a User-Agent (UA) which has certain address parameter and/or value
  *
  * @param name  SIP Address parameter name
